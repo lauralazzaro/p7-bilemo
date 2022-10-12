@@ -2,6 +2,8 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Brand;
+use App\Entity\Product;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -18,19 +20,41 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        // Création d'un user "normal"
+        // Create normal user
         $user = new User();
         $user->setEmail("user@bilemo.com");
         $user->setRoles(["ROLE_USER"]);
         $user->setPassword($this->userPasswordHasher->hashPassword($user, "password"));
         $manager->persist($user);
 
-        // Création d'un user admin
+        // CreaTe user admin
         $userAdmin = new User();
         $userAdmin->setEmail("admin@bilemo.com");
         $userAdmin->setRoles(["ROLE_ADMIN"]);
         $userAdmin->setPassword($this->userPasswordHasher->hashPassword($userAdmin, "password"));
         $manager->persist($userAdmin);
+
+        // Create brand
+        $arrayBrand = ['Apple', 'Samsung', 'Huawei', 'OneNote', 'Xiaomi'];
+        $i = 0;
+        foreach ($arrayBrand as $brandName) {
+            $brand = new Brand();
+            $brand->setName($brandName);
+            $manager->persist($brand);
+            $this->setReference('brand' . $i, $brand);
+            $i++;
+        }
+
+        for ($i = 0; $i < 5; $i++) {
+            $product = new Product();
+            $product->setModel('Model ' . $i);
+            $product->setBrand($this->getReference('brand' . $i));
+            $product->setColor('Black');
+            $product->setMemory('64 Mb');
+            $product->setRearCamera('12 MP');
+            $product->setScreenSize('6.1 in');
+            $manager->persist($product);
+        }
 
         $manager->flush();
     }
