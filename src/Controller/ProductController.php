@@ -8,6 +8,7 @@ use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -43,6 +44,7 @@ class ProductController extends AbstractController
     }
 
     #[Route('/api/products', name:"createProduct", methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN', message: 'You don\'t have the right to create a product')]
     public function createProduct(Request $request, SerializerInterface $serializer, EntityManagerInterface $em, UrlGeneratorInterface $urlGenerator, BrandRepository $brandRepository): JsonResponse
     {
         $product = $serializer->deserialize($request->getContent(), Product::class, 'json');
@@ -66,6 +68,7 @@ class ProductController extends AbstractController
 
 
     #[Route('/api/products/product/{id}/delete', name: 'app_product_delete', methods: ['DELETE'])]
+    #[IsGranted('ROLE_ADMIN', message: 'You don\'t have the right to delete a product')]
     public function deleteProduct(Product $product, EntityManagerInterface $em): JsonResponse
     {
         $em->remove($product);
