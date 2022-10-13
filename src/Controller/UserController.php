@@ -61,9 +61,8 @@ class UserController extends AbstractController
 
         $content = $request->toArray();
 
-        $idCompany = $content['companyId'] ?? -1;
-
-        $user->setCompany($clientRepository->find($idCompany));
+        $idClient = $content['clientId'] ?? -1;
+        $user->setClient($clientRepository->find($idClient));
 
         $em->persist($user);
         $em->flush();
