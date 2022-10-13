@@ -38,26 +38,26 @@ class AppFixtures extends Fixture
         $manager->persist($user);
 
         // Create user admin
-        $userAdmin = new User();
-        $userAdmin->setEmail("admin@bilemo.com");
-        $userAdmin->setRoles(["ROLE_ADMIN"]);
-        $userAdmin->setPassword($this->userPasswordHasher->hashPassword($userAdmin, "password"));
-        $manager->persist($userAdmin);
+        $admin = new User();
+        $admin->setEmail("admin@bilemo.com");
+        $admin->setRoles(["ROLE_ADMIN"]);
+        $admin->setPassword($this->userPasswordHasher->hashPassword($admin, "password"));
+        $manager->persist($admin);
 
         // Create client user
-        $user = new User();
-        $user->setEmail("clientuser@bilemo.com");
-        $user->setRoles(["ROLE_USER"]);
-        $user->setPassword($this->userPasswordHasher->hashPassword($user, "password"));
-        $user->setCompany($this->getReference('client' . random_int(0, 4)));
-        $manager->persist($user);
+        $userClient = new User();
+        $userClient->setEmail("clientuser@bilemo.com");
+        $userClient->setRoles(["ROLE_USER"]);
+        $userClient->setPassword($this->userPasswordHasher->hashPassword($userClient, "password"));
+        $userClient->setClient($this->getReference('client' . random_int(0, 4)));
+        $manager->persist($userClient);
 
         // CreaTe client admin
         $userAdmin = new User();
         $userAdmin->setEmail("clientadmin@bilemo.com");
         $userAdmin->setRoles(["ROLE_ADMIN"]);
         $userAdmin->setPassword($this->userPasswordHasher->hashPassword($userAdmin, "password"));
-        $userAdmin->setCompany($this->getReference('client' . random_int(0, 4)));
+        $userAdmin->setClient($this->getReference('client' . random_int(0, 4)));
         $manager->persist($userAdmin);
 
         // Create brand

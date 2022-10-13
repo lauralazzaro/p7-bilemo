@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -23,6 +25,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column]
     #[Groups(["getUsers"])]
+    /**
+     * @Serializer\Type (name="array<string>")
+     */
     private array $roles = [];
 
     /**
@@ -31,9 +36,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(inversedBy: 'users')]
     #[Groups(["getUsers"])]
-    private ?Client $company = null;
+    private ?Client $client = null;
+
+    private UserPasswordHasherInterface $userPasswordHasher;
+
+    public function __construct(UserPasswordHasherInterface $userPasswordHasher)
+    {
+        $this->userPasswordHasher = $userPasswordHasher;
+    }
 
     public function getId(): ?int
     {
@@ -114,14 +126,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->getUserIdentifier();
     }
 
-    public function getCompany(): ?Client
+    public function getClient(): ?Client
     {
-        return $this->company;
+        return $this->client;
     }
 
-    public function setCompany(?Client $company): self
+    public function setClient(?Client $client): self
     {
-        $this->company = $company;
+        $this->client = $client;
 
         return $this;
     }
