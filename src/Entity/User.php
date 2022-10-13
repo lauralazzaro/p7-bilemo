@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\Groups;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -13,12 +14,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["getUsers"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
+    #[Groups(["getUsers"])]
     private ?string $email = null;
 
     #[ORM\Column]
+    #[Groups(["getUsers"])]
     private array $roles = [];
 
     /**
@@ -26,6 +30,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     private ?string $password = null;
+
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[Groups(["getUsers"])]
+    private ?Client $company = null;
 
     public function getId(): ?int
     {
@@ -104,5 +112,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUsername(): string {
         return $this->getUserIdentifier();
+    }
+
+    public function getCompany(): ?Client
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?Client $company): self
+    {
+        $this->company = $company;
+
+        return $this;
     }
 }

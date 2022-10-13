@@ -36,44 +36,10 @@ class ProductController extends AbstractController
 
         if($productDetail){
             $context = SerializationContext::create()->setGroups(['getProducts']);
-            $jsonProductList = $serializer->serialize($productDetail, 'json', $context);
-            return new JsonResponse($jsonProductList, Response::HTTP_OK, [], true);
+            $jsonProductDetail = $serializer->serialize($productDetail, 'json', $context);
+            return new JsonResponse($jsonProductDetail, Response::HTTP_OK, [], true);
         }
 
         return new JsonResponse(null, Response::HTTP_NOT_FOUND);
-    }
-
-    #[Route('/api/products', name:"createProduct", methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN', message: 'You don\'t have the right to create a product')]
-    public function createProduct(Request $request, SerializerInterface $serializer, EntityManagerInterface $em, UrlGeneratorInterface $urlGenerator, BrandRepository $brandRepository): JsonResponse
-    {
-        $product = $serializer->deserialize($request->getContent(), Product::class, 'json');
-
-        $content = $request->toArray();
-
-        $idBrand = $content['brandId'] ?? -1;
-
-        $product->setBrand($brandRepository->find($idBrand));
-
-        $em->persist($product);
-        $em->flush();
-
-        $context = SerializationContext::create()->setGroups(['getProducts']);
-        $jsonProduct = $serializer->serialize($product, 'json', $context);
-
-        $location = $urlGenerator->generate('app_product_detail', ['id' => $product->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
-
-        return new JsonResponse($jsonProduct, Response::HTTP_CREATED, ["Location" => $location], true);
-    }
-
-
-    #[Route('/api/products/product/{id}/delete', name: 'app_product_delete', methods: ['DELETE'])]
-    #[IsGranted('ROLE_ADMIN', message: 'You don\'t have the right to delete a product')]
-    public function deleteProduct(Product $product, EntityManagerInterface $em): JsonResponse
-    {
-        $em->remove($product);
-        $em->flush();
-
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 }
