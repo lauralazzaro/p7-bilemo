@@ -5,8 +5,6 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\Groups;
-use JMS\Serializer\Annotation as Serializer;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -16,18 +14,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["getUsers"])]
+    #[Groups(["getUsers", "getClients"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Groups(["getUsers"])]
+    #[Groups(["getUsers", "getClients"])]
     private ?string $email = null;
 
     #[ORM\Column]
-    #[Groups(["getUsers"])]
-    /**
-     * @Serializer\Type (name="array<string>")
-     */
+    #[Groups(["getUsers", "getClients"])]
     private array $roles = [];
 
     /**
@@ -39,13 +34,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToOne(inversedBy: 'users')]
     #[Groups(["getUsers"])]
     private ?Client $client = null;
-
-    private UserPasswordHasherInterface $userPasswordHasher;
-
-    public function __construct(UserPasswordHasherInterface $userPasswordHasher)
-    {
-        $this->userPasswordHasher = $userPasswordHasher;
-    }
 
     public function getId(): ?int
     {
@@ -71,7 +59,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
-        return (string) $this->email;
+        return (string)$this->email;
     }
 
     /**
@@ -122,7 +110,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @return string
      */
-    public function getUsername(): string {
+    public function getUsername(): string
+    {
         return $this->getUserIdentifier();
     }
 

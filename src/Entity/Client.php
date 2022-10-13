@@ -14,18 +14,19 @@ class Client
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["getUsers"])]
+    #[Groups(["getUsers", "getClients"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["getUsers"])]
+    #[Groups(["getUsers", "getClients"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(["getUsers"])]
+    #[Groups(["getUsers", "getClients"])]
     private ?string $telephone = null;
 
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: User::class)]
+    #[Groups(["getClients"])]
     private Collection $users;
 
     public function __construct()
