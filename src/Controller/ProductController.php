@@ -33,7 +33,7 @@ class ProductController extends AbstractController
     {
         $productDetail = $productRepository->find($id);
 
-        if($productDetail){
+        if ($productDetail) {
             $context = SerializationContext::create()->setGroups(['getProducts']);
             $jsonProductDetail = $serializer->serialize($productDetail, 'json', $context);
             return new JsonResponse($jsonProductDetail, Response::HTTP_OK, [], true);

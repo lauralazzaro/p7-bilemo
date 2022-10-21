@@ -57,8 +57,8 @@ class UserController extends AbstractController
         SerializerInterface $serializer,
         EntityManagerInterface $em,
         UrlGeneratorInterface $urlGenerator,
-        ClientRepository $clientRepository): JsonResponse
-    {
+        ClientRepository $clientRepository
+    ): JsonResponse {
         $user = $serializer->deserialize($request->getContent(), User::class, 'json');
 
         $content = $request->toArray();
@@ -82,8 +82,8 @@ class UserController extends AbstractController
     #[IsGranted('ROLE_ADMIN', message: 'You don\'t have the right to delete a user')]
     public function deleteUser(
         User $user,
-        EntityManagerInterface $em): JsonResponse
-    {
+        EntityManagerInterface $em
+    ): JsonResponse {
         $em->remove($user);
         $em->flush();
 
