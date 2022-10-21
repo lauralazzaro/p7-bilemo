@@ -16,7 +16,7 @@ use Hateoas\Configuration\Annotation as Hateoas;
  *          "app_user_detail",
  *          parameters = { "id" = "expr(object.getId())" }
  *      ),
- *     exclusion = @Hateoas\Exclusion(groups="getClients")
+ *     exclusion = @Hateoas\Exclusion(groups="getClients", excludeIf = "expr(not is_granted('ROLE_ADMIN'))")
  * )
  *
  *  * @Hateoas\Relation(
@@ -25,7 +25,7 @@ use Hateoas\Configuration\Annotation as Hateoas;
  *          "app_create_user",
  *          parameters = { "id" = "expr(object.getId())" },
  *      ),
- *      exclusion = @Hateoas\Exclusion(groups="getClients", excludeIf = "expr(not is_granted('ROLE_ADMIN'))"),
+ *      exclusion = @Hateoas\Exclusion(groups="getClients", excludeIf = "expr(not is_granted('ROLE_ADMIN'))")
  * )
  */
 #[ORM\Entity(repositoryClass: UserRepository::class)]

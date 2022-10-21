@@ -19,10 +19,11 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class UserController extends AbstractController
 {
     #[Route('/api/users', name: 'app_user', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN', message: 'You don\'t have the right to with the list of users')]
     public function index(
         UserRepository $userRepository,
-        SerializerInterface $serializer): JsonResponse
-    {
+        SerializerInterface $serializer
+    ): JsonResponse {
         $userList = $userRepository->findAll();
 
         $context = SerializationContext::create()->setGroups(['getUsers']);
@@ -32,14 +33,15 @@ class UserController extends AbstractController
     }
 
     #[Route('/api/users/user/{id}', name: 'app_user_detail', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN', message: 'You don\'t have the right to view the details of a user')]
     public function detailsUser(
         UserRepository $userRepository,
         SerializerInterface $serializer,
-        int $id): JsonResponse
-    {
+        int $id
+    ): JsonResponse {
         $userDetails = $userRepository->find($id);
 
-        if($userDetails){
+        if ($userDetails) {
             $context = SerializationContext::create()->setGroups(['getUsers']);
             $jsonUserDetails = $serializer->serialize($userDetails, 'json', $context);
             return new JsonResponse($jsonUserDetails, Response::HTTP_OK, [], true);
