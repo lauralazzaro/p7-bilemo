@@ -31,34 +31,24 @@ class AppFixtures extends Fixture
         }
 
         // Create normal user
-        $user = new User();
-        $user->setEmail("user@bilemo.com");
-        $user->setRoles(["ROLE_USER"]);
-        $user->setPassword($this->userPasswordHasher->hashPassword($user, "password"));
-        $manager->persist($user);
+        for ($i = 0; $i < 15; $i++) {
+            $user = new User();
+            $user->setEmail("user$i@bilemo.com");
+            $user->setRoles(["ROLE_USER"]);
+            $user->setClient($this->getReference('client' . random_int(0, 4)));
+            $user->setPassword($this->userPasswordHasher->hashPassword($user, "password"));
+            $manager->persist($user);
+        }
 
         // Create user admin
-        $admin = new User();
-        $admin->setEmail("admin@bilemo.com");
-        $admin->setRoles(["ROLE_ADMIN"]);
-        $admin->setPassword($this->userPasswordHasher->hashPassword($admin, "password"));
-        $manager->persist($admin);
-
-        // Create client user
-        $userClient = new User();
-        $userClient->setEmail("clientuser@bilemo.com");
-        $userClient->setRoles(["ROLE_USER"]);
-        $userClient->setPassword($this->userPasswordHasher->hashPassword($userClient, "password"));
-        $userClient->setClient($this->getReference('client' . random_int(0, 4)));
-        $manager->persist($userClient);
-
-        // CreaTe client admin
-        $userAdmin = new User();
-        $userAdmin->setEmail("clientadmin@bilemo.com");
-        $userAdmin->setRoles(["ROLE_ADMIN"]);
-        $userAdmin->setPassword($this->userPasswordHasher->hashPassword($userAdmin, "password"));
-        $userAdmin->setClient($this->getReference('client' . random_int(0, 4)));
-        $manager->persist($userAdmin);
+        for ($i = 0; $i < 5; $i++) {
+            $admin = new User();
+            $admin->setEmail("admin$i@bilemo.com");
+            $admin->setRoles(["ROLE_ADMIN"]);
+            $admin->setClient($this->getReference('client' . $i));
+            $admin->setPassword($this->userPasswordHasher->hashPassword($admin, "password"));
+            $manager->persist($admin);
+        }
 
         // Create brand
         $arrayBrand = ['Apple', 'Samsung', 'Huawei', 'OneNote', 'Xiaomi'];
@@ -69,10 +59,10 @@ class AppFixtures extends Fixture
             $this->setReference('brand' . $i, $brand);
         }
 
-        for ($i = 0; $i < 5; $i++) {
+        for ($i = 0; $i < 20; $i++) {
             $product = new Product();
             $product->setModel('Model ' . $i);
-            $product->setBrand($this->getReference('brand' . $i));
+            $product->setBrand($this->getReference('brand' . random_int(0, 4)));
             $product->setColor('Black');
             $product->setMemory('64 Mb');
             $product->setRearCamera('12 MP');

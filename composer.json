@@ -26,7 +26,8 @@
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^3.4",
-        "symfony/maker-bundle": "^1.47"
+        "symfony/maker-bundle": "^1.47",
+        "squizlabs/php_codesniffer": "3.*"
     },
     "config": {
         "allow-plugins": {
@@ -76,7 +77,7 @@
     },
     "extra": {
         "symfony": {
-            "allow-contrib": false,
+            "allow-contrib": true,
             "require": "6.1.*"
         }
     }

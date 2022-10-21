@@ -19,10 +19,11 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class UserController extends AbstractController
 {
     #[Route('/api/users', name: 'app_user', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN', message: 'You don\'t have the right to with the list of users')]
     public function index(
         UserRepository $userRepository,
-        SerializerInterface $serializer): JsonResponse
-    {
+        SerializerInterface $serializer
+    ): JsonResponse {
         $userList = $userRepository->findAll();
 
         $context = SerializationContext::create()->setGroups(['getUsers']);
@@ -32,14 +33,15 @@ class UserController extends AbstractController
     }
 
     #[Route('/api/users/user/{id}', name: 'app_user_detail', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN', message: 'You don\'t have the right to view the details of a user')]
     public function detailsUser(
         UserRepository $userRepository,
         SerializerInterface $serializer,
-        int $id): JsonResponse
-    {
+        int $id
+    ): JsonResponse {
         $userDetails = $userRepository->find($id);
 
-        if($userDetails){
+        if ($userDetails) {
             $context = SerializationContext::create()->setGroups(['getUsers']);
             $jsonUserDetails = $serializer->serialize($userDetails, 'json', $context);
             return new JsonResponse($jsonUserDetails, Response::HTTP_OK, [], true);
@@ -55,8 +57,8 @@ class UserController extends AbstractController
         SerializerInterface $serializer,
         EntityManagerInterface $em,
         UrlGeneratorInterface $urlGenerator,
-        ClientRepository $clientRepository): JsonResponse
-    {
+        ClientRepository $clientRepository
+    ): JsonResponse {
         $user = $serializer->deserialize($request->getContent(), User::class, 'json');
 
         $content = $request->toArray();
@@ -80,8 +82,8 @@ class UserController extends AbstractController
     #[IsGranted('ROLE_ADMIN', message: 'You don\'t have the right to delete a user')]
     public function deleteUser(
         User $user,
-        EntityManagerInterface $em): JsonResponse
-    {
+        EntityManagerInterface $em
+    ): JsonResponse {
         $em->remove($user);
         $em->flush();
 
