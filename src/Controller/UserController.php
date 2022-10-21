@@ -72,7 +72,11 @@ class UserController extends AbstractController
         $context = SerializationContext::create()->setGroups(['getUsers']);
         $jsonUser = $serializer->serialize($user, 'json', $context);
 
-        $location = $urlGenerator->generate('app_user_detail', ['id' => $user->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+        $location = $urlGenerator->generate(
+            'app_user_detail',
+            ['id' => $user->getId()],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
 
         return new JsonResponse($jsonUser, Response::HTTP_CREATED, ["Location" => $location], true);
     }

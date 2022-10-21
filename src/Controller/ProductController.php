@@ -14,8 +14,11 @@ use Symfony\Component\Routing\Annotation\Route;
 class ProductController extends AbstractController
 {
     #[Route('/api/products', name: 'app_product', methods: ['GET'])]
-    public function index(ProductRepository $productRepository, SerializerInterface $serializer, Request $request): JsonResponse
-    {
+    public function index(
+        ProductRepository $productRepository,
+        SerializerInterface $serializer,
+        Request $request
+    ): JsonResponse {
 
         $page = $request->get('page', 1);
         $limit = $request->get('limit', 3);
@@ -29,8 +32,11 @@ class ProductController extends AbstractController
     }
 
     #[Route('/api/products/product/{id}', name: 'app_product_detail', methods: ['GET'])]
-    public function details(ProductRepository $productRepository, SerializerInterface $serializer, int $id): JsonResponse
-    {
+    public function details(
+        ProductRepository $productRepository,
+        SerializerInterface $serializer,
+        int $id
+    ): JsonResponse {
         $productDetail = $productRepository->find($id);
 
         if ($productDetail) {
@@ -40,5 +46,18 @@ class ProductController extends AbstractController
         }
 
         return new JsonResponse(null, Response::HTTP_NOT_FOUND);
+    }
+
+    #[Route('/api/products/all', name: 'app_product_all', methods: ['GET'])]
+    public function listAllProducts(
+        ProductRepository $productRepository,
+        SerializerInterface $serializer
+    ): JsonResponse {
+        $productList = $productRepository->findAll();
+
+        $context = SerializationContext::create()->setGroups(['getProducts']);
+        $jsonProductList = $serializer->serialize($productList, 'json', $context);
+
+        return new JsonResponse($jsonProductList, Response::HTTP_OK, [], true);
     }
 }

@@ -16,7 +16,7 @@ class ClientController extends AbstractController
     #[Route('/api/clients', name: 'app_client')]
     #[IsGranted('ROLE_ADMIN', message: 'You don\'t have the visualize the list of clients')]
     public function index(
-        ClientRepository    $clientRepository,
+        ClientRepository $clientRepository,
         SerializerInterface $serializer
     ): JsonResponse {
         $userList = $clientRepository->findAll();
@@ -30,9 +30,9 @@ class ClientController extends AbstractController
     #[Route('/api/clients/client/{id}', name: 'app_client_users')]
     #[IsGranted('ROLE_ADMIN', message: 'You don\'t have the right to create a user')]
     public function findUsersOfClient(
-        ClientRepository    $clientRepository,
+        ClientRepository $clientRepository,
         SerializerInterface $serializer,
-        int                 $id
+        int $id
     ): JsonResponse {
         $userList = $clientRepository->find($id);
 
