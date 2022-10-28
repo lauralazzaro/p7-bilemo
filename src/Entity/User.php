@@ -5,10 +5,10 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\Groups;
-use Nelmio\ApiDocBundle\Annotation\Model;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use OpenApi\Attributes as OA;
+use Symfony\Component\Validator\Constraints as Assert;
 use Hateoas\Configuration\Annotation as Hateoas;
 
 /**
@@ -43,6 +43,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180, unique: true)]
     #[Groups(["getUsers", "getClients", "createUser", "detailUser"])]
     #[OA\Property(description: 'Email address of the user', type: 'string', maxLength: 180, nullable: false)]
+    #[Assert\NotBlank]
+    #[Assert\Unique]
     private ?string $email = null;
 
     #[ORM\Column]
@@ -53,6 +55,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     #[Groups(["createUser"])]
     #[OA\Property(description: 'Encrypted password of the user', type: 'string', maxLength: 255, nullable: false)]
+    #[Assert\NotBlank]
     private ?string $password = null;
 
     #[ORM\ManyToOne(inversedBy: 'users')]
