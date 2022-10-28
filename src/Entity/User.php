@@ -7,6 +7,8 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\Groups;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use OpenApi\Attributes as OA;
+use Symfony\Component\Validator\Constraints as Assert;
 use Hateoas\Configuration\Annotation as Hateoas;
 
 /**
@@ -34,25 +36,31 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["getUsers", "getClients"])]
+    #[Groups(["getUsers", "getClients", "detailUser"])]
+    #[OA\Property(description: 'Id number of the user', type: 'integer')]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Groups(["getUsers", "getClients"])]
+    #[Groups(["getUsers", "getClients", "createUser", "detailUser"])]
+    #[OA\Property(description: 'Email address of the user', type: 'string', maxLength: 180, nullable: false)]
+    #[Assert\NotBlank]
+    #[Assert\Unique]
     private ?string $email = null;
 
     #[ORM\Column]
-    #[Groups(["getUsers", "getClients"])]
+    #[Groups(["getUsers", "getClients", "createUser", "detailUser"])]
+    #[OA\Property(description: 'User role', type: 'string', maxLength: 255, nullable: true)]
     private array $roles = [];
 
-    /**
-     * @var string The hashed password
-     */
     #[ORM\Column]
+    #[Groups(["createUser"])]
+    #[OA\Property(description: 'Encrypted password of the user', type: 'string', maxLength: 255, nullable: false)]
+    #[Assert\NotBlank]
     private ?string $password = null;
 
     #[ORM\ManyToOne(inversedBy: 'users')]
-    #[Groups(["getUsers"])]
+    #[Groups(["createUser", "detailUser"])]
+    #[OA\Property(description: 'Id number of the client')]
     private ?Client $client = null;
 
     public function getId(): ?int

@@ -5,7 +5,7 @@ namespace App\Entity;
 use App\Repository\ProductRepository;
 use JMS\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
-
+use Symfony\Component\Validator\Constraints as Assert;
 use Hateoas\Configuration\Annotation as Hateoas;
 
 /**
@@ -30,6 +30,8 @@ class Product
 
     #[ORM\Column(length: 255)]
     #[Groups(["getProducts"])]
+    #[Assert\NotBlank]
+    #[Assert\Unique]
     private ?string $model = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -51,6 +53,7 @@ class Product
     #[ORM\ManyToOne(inversedBy: 'products')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(["getProducts"])]
+    #[Assert\NotBlank]
     private ?Brand $brand = null;
 
     public function getId(): ?int
