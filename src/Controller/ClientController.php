@@ -13,6 +13,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use OpenApi\Attributes as OA;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class ClientController extends AbstractController
 {
@@ -53,9 +55,18 @@ class ClientController extends AbstractController
     public function findUsersOfClient(
         ClientRepository $clientRepository,
         SerializerInterface $serializer,
+        TagAwareCacheInterface $cache,
         int $id
     ): JsonResponse {
-        $userList = $clientRepository->find($id);
+
+        $idCache = "getUsersOfClient-$id";
+
+        $userList = $cache->get($idCache, function (ItemInterface $item) use ($clientRepository, $id) {
+            echo "No user in cache for this client\n";
+            $item->tag("usersClientCache");
+            $item->expiresAfter(60);
+            return $clientRepository->find($id);
+        });
 
         $context = SerializationContext::create()->setGroups(['getClients']);
         $jsonUserList = $serializer->serialize($userList, 'json', $context);

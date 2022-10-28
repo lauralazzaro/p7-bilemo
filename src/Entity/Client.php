@@ -29,7 +29,7 @@ class Client
     private ?string $telephone = null;
 
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: User::class)]
-    #[Groups(["getUsers"])]
+    #[Groups(["getUsers", "getClients"])]
     private Collection $users;
 
     public function __construct()

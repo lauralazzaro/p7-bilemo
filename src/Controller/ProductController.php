@@ -13,6 +13,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use OpenApi\Attributes as OA;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class ProductController extends AbstractController
 {
@@ -26,13 +28,19 @@ class ProductController extends AbstractController
     public function index(
         ProductRepository $productRepository,
         SerializerInterface $serializer,
-        Request $request
+        Request $request,
+        TagAwareCacheInterface $cache
     ): JsonResponse {
 
         $page = $request->get('page', 1);
         $limit = $request->get('limit', 3);
 
-        $productList = $productRepository->findAllWithPagination($page, $limit);
+        $idCache = "getAllProducts-$page-$limit";
+        $productList = $cache->get($idCache, function (ItemInterface $item) use ($productRepository, $page, $limit) {
+            echo "No products in cache\n";
+            $item->tag("productsCache");
+            return $productRepository->findAllWithPagination($page, $limit);
+        });
 
         $context = SerializationContext::create()->setGroups(['getProducts']);
         $jsonProductList = $serializer->serialize($productList, 'json', $context);
