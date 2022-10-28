@@ -2,12 +2,14 @@
 
 namespace App\Controller;
 
+use App\Entity\Client;
 use App\Entity\User;
 use App\Repository\ClientRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
+use Nelmio\ApiDocBundle\Annotation\Model;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,25 +17,27 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use OpenApi\Attributes as OA;
 
 class UserController extends AbstractController
 {
-    #[Route('/api/users', name: 'app_user', methods: ['GET'])]
-    #[IsGranted('ROLE_ADMIN', message: 'You don\'t have the right to with the list of users')]
-    public function index(
-        UserRepository $userRepository,
-        SerializerInterface $serializer
-    ): JsonResponse {
-        $userList = $userRepository->findAll();
-
-        $context = SerializationContext::create()->setGroups(['getUsers']);
-        $jsonUserList = $serializer->serialize($userList, 'json', $context);
-
-        return new JsonResponse($jsonUserList, Response::HTTP_OK, [], true);
-    }
-
-    #[Route('/api/users/user/{id}', name: 'app_user_detail', methods: ['GET'])]
+    #[Route('/api/users/{id}', name: 'app_user_detail', methods: ['GET'])]
     #[IsGranted('ROLE_ADMIN', message: 'You don\'t have the right to view the details of a user')]
+    #[OA\Response(
+        response: 200,
+        description: 'Returns the details of one user',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: User::class, groups: ['detailUser']))
+        )
+    )]
+    #[OA\Parameter(
+        name: 'id',
+        description: 'The id number of the user',
+        in: 'path',
+        schema: new OA\Schema(type: 'integer')
+    )]
+    #[OA\Tag(name: 'User')]
     public function detailsUser(
         UserRepository $userRepository,
         SerializerInterface $serializer,
@@ -47,11 +51,28 @@ class UserController extends AbstractController
             return new JsonResponse($jsonUserDetails, Response::HTTP_OK, [], true);
         }
 
-        return new JsonResponse(null, Response::HTTP_NOT_FOUND);
+        return new JsonResponse('User not found', Response::HTTP_NOT_FOUND);
     }
 
-    #[Route('/api/users', name:"app_create_user", methods: ['POST'])]
+    #[Route('/api/users', name: "app_create_user", methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN', message: 'You don\'t have the right to create a user')]
+    #[OA\Response(
+        response: 200,
+        description: 'Create one user',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: User::class, groups: ['getUsers']))
+        )
+    )]
+    #[OA\RequestBody(
+        description: 'Body of the user to create',
+        required: true,
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: User::class, groups: ['createUser']))
+        )
+    )]
+    #[OA\Tag(name: 'User')]
     public function createUser(
         Request $request,
         SerializerInterface $serializer,
@@ -82,8 +103,19 @@ class UserController extends AbstractController
     }
 
 
-    #[Route('/api/users/user/{id}/delete', name: 'app_user_delete', methods: ['DELETE'])]
+    #[Route('/api/users/{id}', name: 'app_user_delete', methods: ['DELETE'])]
     #[IsGranted('ROLE_ADMIN', message: 'You don\'t have the right to delete a user')]
+    #[OA\Response(
+        response: 204,
+        description: 'Delete one user'
+    )]
+    #[OA\Parameter(
+        name: 'id',
+        description: 'The id number of the user',
+        in: 'path',
+        schema: new OA\Schema(type: 'integer')
+    )]
+    #[OA\Tag(name: 'User')]
     public function deleteUser(
         User $user,
         EntityManagerInterface $em
