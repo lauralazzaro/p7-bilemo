@@ -61,15 +61,14 @@ class ClientController extends AbstractController
 
         $idCache = "getUsersOfClient-$id";
 
-        $userList = $cache->get($idCache, function (ItemInterface $item) use ($clientRepository, $id) {
+        $jsonUserList = $cache->get($idCache, function (ItemInterface $item) use ($clientRepository, $id, $serializer) {
             echo "No user in cache for this client\n";
             $item->tag("usersClientCache");
             $item->expiresAfter(60);
-            return $clientRepository->find($id);
+            $userList = $clientRepository->find($id);
+            $context = SerializationContext::create()->setGroups(['getClients']);
+            return $serializer->serialize($userList, 'json', $context);
         });
-
-        $context = SerializationContext::create()->setGroups(['getClients']);
-        $jsonUserList = $serializer->serialize($userList, 'json', $context);
 
         return new JsonResponse($jsonUserList, Response::HTTP_OK, [], true);
     }
