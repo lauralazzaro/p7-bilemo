@@ -26,6 +26,7 @@ class Client
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(["getUsers", "getClients", "detailUser"])]
+    #[Assert\Unique]
     private ?string $telephone = null;
 
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: User::class)]

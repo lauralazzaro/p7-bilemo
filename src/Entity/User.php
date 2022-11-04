@@ -41,19 +41,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Groups(["getUsers", "getClients", "createUser", "detailUser"])]
+    #[Groups(["getUsers", "getClients", "createUser", "detailUser", "updateUser"])]
     #[OA\Property(description: 'Email address of the user', type: 'string', maxLength: 180, nullable: false)]
     #[Assert\NotBlank]
     #[Assert\Unique]
     private ?string $email = null;
 
     #[ORM\Column]
-    #[Groups(["getUsers", "getClients", "createUser", "detailUser"])]
+    #[Groups(["getUsers", "getClients", "createUser", "detailUser", "updateUser"])]
     #[OA\Property(description: 'User role', type: 'string', maxLength: 255, nullable: true)]
     private array $roles = [];
 
     #[ORM\Column]
-    #[Groups(["createUser"])]
+    #[Groups(["createUser", "updateUser"])]
     #[OA\Property(description: 'Encrypted password of the user', type: 'string', maxLength: 255, nullable: false)]
     #[Assert\NotBlank]
     private ?string $password = null;

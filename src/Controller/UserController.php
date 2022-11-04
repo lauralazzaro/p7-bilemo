@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Client;
 use App\Entity\User;
 use App\Repository\ClientRepository;
 use App\Repository\UserRepository;
@@ -124,5 +123,70 @@ class UserController extends AbstractController
         $em->flush();
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+    }
+
+    #[Route('/api/users/{id}', name: 'app_user_update', methods: ['PUT'])]
+    #[IsGranted('ROLE_ADMIN', message: 'You don\'t have the right to update the details of a user')]
+    #[OA\Response(
+        response: 200,
+        description: 'Returns the details of one user after an update',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: User::class, groups: ['detailUser']))
+        )
+    )]
+    #[OA\Parameter(
+        name: 'id',
+        description: 'The id number of the user',
+        in: 'path',
+        schema: new OA\Schema(type: 'integer')
+    )]
+    #[OA\RequestBody(
+        description: 'Body of the user to update',
+        required: true,
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: User::class, groups: ['updateUser']))
+        )
+    )]
+    #[OA\Tag(name: 'User')]
+    public function updateUser(
+        Request $request,
+        SerializerInterface $serializer,
+        EntityManagerInterface $em,
+        UrlGeneratorInterface $urlGenerator,
+        int $id
+    ): JsonResponse {
+
+        $user = $em->getRepository(User::class)->find($id);
+
+        if (!$user) {
+            throw $this->createNotFoundException(
+                'No user found for id ' . $id
+            );
+        }
+
+        $bodyUser = $serializer->deserialize($request->getContent(), User::class, 'json');
+
+        if ($bodyUser->getEmail() !== '') {
+            $user->setEmail($bodyUser->getEmail());
+        }
+
+        if ($bodyUser->getPassword() !== '') {
+            $user->setPassword($bodyUser->getPassword());
+        }
+
+        $em->flush();
+
+        $context = SerializationContext::create()->setGroups(['getUsers']);
+        $jsonUser = $serializer->serialize($user, 'json', $context);
+
+        $location = $urlGenerator->generate(
+            'app_user_detail',
+            ['id' => $id],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
+        return new JsonResponse($jsonUser, Response::HTTP_OK, ["Location" => $location], true);
     }
 }
