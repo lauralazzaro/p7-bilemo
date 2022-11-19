@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Client;
 use App\Repository\ClientRepository;
+use App\Service\VersioningService;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -53,22 +54,26 @@ class ClientController extends AbstractController
     )]
     #[OA\Tag(name: 'Client')]
     public function findUsersOfClient(
+        VersioningService $versioningService,
         ClientRepository $clientRepository,
         SerializerInterface $serializer,
         TagAwareCacheInterface $cache,
         int $id
     ): JsonResponse {
-
+        $version = $versioningService->getVersion();
         $idCache = "getUsersOfClient-$id";
-
-        $jsonUserList = $cache->get($idCache, function (ItemInterface $item) use ($clientRepository, $id, $serializer) {
-            echo "No user in cache for this client\n";
-            $item->tag("usersClientCache");
-            $item->expiresAfter(60);
-            $userList = $clientRepository->find($id);
-            $context = SerializationContext::create()->setGroups(['getClients']);
-            return $serializer->serialize($userList, 'json', $context);
-        });
+        $jsonUserList = $cache->get(
+            $idCache,
+            function (ItemInterface $item) use ($clientRepository, $id, $serializer, $version) {
+                echo "No user in cache for this client\n";
+                $item->tag("usersClientCache");
+                $item->expiresAfter(60);
+                $userList = $clientRepository->find($id);
+                $context = SerializationContext::create()->setGroups(['getClients']);
+                $context->setVersion($version);
+                return $serializer->serialize($userList, 'json', $context);
+            }
+        );
 
         return new JsonResponse($jsonUserList, Response::HTTP_OK, [], true);
     }

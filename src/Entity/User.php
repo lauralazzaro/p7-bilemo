@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\Since;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use OpenApi\Attributes as OA;
@@ -62,6 +63,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(["createUser", "detailUser"])]
     #[OA\Property(description: 'Id number of the client')]
     private ?Client $client = null;
+
+    #[ORM\Column(length: 180)]
+    #[Groups(["getUsers", "getClients", "createUser", "detailUser", "updateUser"])]
+    #[OA\Property(description: 'Name of the user', type: 'string', nullable: true)]
+    #[Since("2.0")]
+    private ?string $name = null;
+
+    #[ORM\Column(length: 180)]
+    #[Groups(["getUsers", "getClients", "createUser", "detailUser", "updateUser"])]
+    #[OA\Property(description: 'Lastname of the user', type: 'string', nullable: true)]
+    #[Since("2.0")]
+    private ?string $lastname = null;
+
+    #[ORM\Column(length: 180)]
+    #[Groups(["getUsers", "getClients", "createUser", "detailUser", "updateUser"])]
+    #[OA\Property(description: 'Lastname of the user', type: 'string', nullable: true)]
+    #[Since("2.0")]
+    private ?string $telephone = null;
 
     public function getId(): ?int
     {
@@ -153,5 +172,53 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->client = $client;
 
         return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string|null $name
+     */
+    public function setName(?string $name): void
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLastname(): ?string
+    {
+        return $this->lastname;
+    }
+
+    /**
+     * @param string|null $lastname
+     */
+    public function setLastname(?string $lastname): void
+    {
+        $this->lastname = $lastname;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getTelephone(): ?string
+    {
+        return $this->telephone;
+    }
+
+    /**
+     * @param string|null $telephone
+     */
+    public function setTelephone(?string $telephone): void
+    {
+        $this->telephone = $telephone;
     }
 }

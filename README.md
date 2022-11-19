@@ -74,16 +74,11 @@ the --append option.
 
 ### Start the server with
 
-> symfony server:start
-<br>
-
-### URL for the project
-
-> http://127.0.0.1:8000
+> symfony server:start --port=8000
 <br>
 
 ### URL for the the API doc
 
-> https://127.0.0.1:8000/api/doc
+> http://127.0.0.1:8000/api/doc
 <br>
 
