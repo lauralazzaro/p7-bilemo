@@ -4,11 +4,13 @@ namespace App\Controller;
 
 use App\Entity\Client;
 use App\Repository\ClientRepository;
+use App\Service\VersioningService;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -53,23 +55,30 @@ class ClientController extends AbstractController
     )]
     #[OA\Tag(name: 'Client')]
     public function findUsersOfClient(
+        VersioningService $versioningService,
         ClientRepository $clientRepository,
         SerializerInterface $serializer,
         TagAwareCacheInterface $cache,
+        Request $request,
         int $id
     ): JsonResponse {
-
+        $version = $versioningService->getVersion();
         $idCache = "getUsersOfClient-$id";
+        $page = $request->get('page', 1);
+        $limit = $request->get('limit', 3);
 
-        $userList = $cache->get($idCache, function (ItemInterface $item) use ($clientRepository, $id) {
-            echo "No user in cache for this client\n";
-            $item->tag("usersClientCache");
-            $item->expiresAfter(60);
-            return $clientRepository->find($id);
-        });
-
-        $context = SerializationContext::create()->setGroups(['getClients']);
-        $jsonUserList = $serializer->serialize($userList, 'json', $context);
+        $jsonUserList = $cache->get(
+            $idCache,
+            function (ItemInterface $item) use ($clientRepository, $id, $serializer, $version, $page, $limit) {
+                echo "No user in cache for this client\n";
+                $item->tag("usersClientCache");
+                $item->expiresAfter(60);
+                $userList = $clientRepository->findUserWithPagination($page, $limit, $id);
+                $context = SerializationContext::create()->setGroups(['getClients']);
+                $context->setVersion($version);
+                return $serializer->serialize($userList, 'json', $context);
+            }
+        );
 
         return new JsonResponse($jsonUserList, Response::HTTP_OK, [], true);
     }

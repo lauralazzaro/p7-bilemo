@@ -39,6 +39,18 @@ class ClientRepository extends ServiceEntityRepository
         }
     }
 
+    public function findUserWithPagination($page, $limit, $id)
+    {
+        $qb = $this->createQueryBuilder('c')
+            ->where('c.id = :id')
+            ->setParameter('id', $id)
+            ->innerJoin('c.users', 'urs')
+            ->addSelect('urs')
+            ->setFirstResult($page)
+            ->setMaxResults($limit);
+
+        return $qb->getQuery()->getResult();
+    }
 //    /**
 //     * @return Client[] Returns an array of Client objects
 //     */
