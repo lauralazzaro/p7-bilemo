@@ -10,6 +10,7 @@ use JMS\Serializer\SerializerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -58,17 +59,21 @@ class ClientController extends AbstractController
         ClientRepository $clientRepository,
         SerializerInterface $serializer,
         TagAwareCacheInterface $cache,
+        Request $request,
         int $id
     ): JsonResponse {
         $version = $versioningService->getVersion();
         $idCache = "getUsersOfClient-$id";
+        $page = $request->get('page', 1);
+        $limit = $request->get('limit', 3);
+
         $jsonUserList = $cache->get(
             $idCache,
-            function (ItemInterface $item) use ($clientRepository, $id, $serializer, $version) {
+            function (ItemInterface $item) use ($clientRepository, $id, $serializer, $version, $page, $limit) {
                 echo "No user in cache for this client\n";
                 $item->tag("usersClientCache");
                 $item->expiresAfter(60);
-                $userList = $clientRepository->find($id);
+                $userList = $clientRepository->findUserWithPagination($page, $limit, $id);
                 $context = SerializationContext::create()->setGroups(['getClients']);
                 $context->setVersion($version);
                 return $serializer->serialize($userList, 'json', $context);
