@@ -31,17 +31,17 @@ Develop a web service exposing an API using the PHP framework Symfony,
 
 ### Create a file named '.env.local' place in the root folder of the project and then configure the variables 'APP_ENV' and 'MAILER_DSN' and 'DATABASE_URL'
 
-> **APP_ENV=prod**
->
+> **APP_ENV=prod**  
 > MAILER_DSN=smtp://user:pass@smtp.example.com:25  
-> DATABASE_URL="mysql://db_user:db_password@127.0.0.1:3306/db_name?serverVersion=5.7&charset=utf8mb4"
+> DATABASE_URL="mysql://db_user:db_password@127.0.0.1:3306/db_name?serverVersion=5.7&charset=utf8mb4"  
 > **db_user and db_password:** *your credentials as database administrator*  
 > **db_name:** *p7-bilemo*  
 > **serverVersion:** *the db engine that you are using in your environment*
-<span style="color: orangered; "> If you get the *sync-metadata-storage* error, verify that you put the right version of the db of your environment in
-serverVersion: </span>
+> 
+> <span style="color: orangered; "> If you get the *sync-metadata-storage* error, verify that you put the right version of the db of your environment in serverVersion: </span> 
+>
+> ..../p7-bilemo?serverVersion=5.7 or ...p7-bilemo?serverVersion=MariaDB-10.4.21
 
-> .../p7-bilemo?serverVersion=5.7 or ...p7-bilemo?serverVersion=MariaDB-10.4.21
 For more information on the setup, please visit:
 
 -   https://symfony.com/doc/current/mailer.html
@@ -66,11 +66,10 @@ For more information on the setup, please visit:
 
 ### Load the fixtures for the database with
 
-> php bin/console doctrine:fixtures:load
-By default, the load command purges the database, removing all data from every table. To append your fixtures' data add
-the --append option.
+> php bin/console doctrine:fixtures:load  
 
-<br>
+By default, the load command purges the database, removing all data from every table.   
+To append your fixtures' data add the --append option.
 
 ### Start the server with
 
@@ -81,4 +80,3 @@ the --append option.
 
 > http://127.0.0.1:8000/api/doc
 <br>
-
