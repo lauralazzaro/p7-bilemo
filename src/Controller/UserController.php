@@ -176,6 +176,18 @@ class UserController extends AbstractController
             $user->setPassword($bodyUser->getPassword());
         }
 
+        if ($bodyUser->getName() !== '') {
+            $user->setName($bodyUser->getName());
+        }
+
+        if ($bodyUser->getLastname() !== '') {
+            $user->setLastname($bodyUser->getLastname());
+        }
+
+        if ($bodyUser->getTelephone() !== '') {
+            $user->setTelephone($bodyUser->getTelephone());
+        }
+
         $em->flush();
 
         $context = SerializationContext::create()->setGroups(['getUsers']);
