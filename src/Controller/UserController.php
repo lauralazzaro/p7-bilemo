@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use OpenApi\Attributes as OA;
@@ -78,7 +79,8 @@ class UserController extends AbstractController
         SerializerInterface $serializer,
         EntityManagerInterface $em,
         UrlGeneratorInterface $urlGenerator,
-        ClientRepository $clientRepository
+        ClientRepository $clientRepository,
+        UserPasswordHasherInterface $passwordHasher
     ): JsonResponse {
         $user = $serializer->deserialize($request->getContent(), User::class, 'json');
 
@@ -94,7 +96,7 @@ class UserController extends AbstractController
 
         $user->setClient($clientRepository->find($idClient));
 
-        $hashedPassword = password_hash($user->getPassword(), PASSWORD_DEFAULT);
+        $hashedPassword = $passwordHasher->hashPassword($user, $content['password']);
         $user->setPassword($hashedPassword);
 
         $em->persist($user);
