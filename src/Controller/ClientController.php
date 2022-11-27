@@ -20,25 +20,25 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class ClientController extends AbstractController
 {
-    #[Route('/api/clients', name: 'app_client', methods: ['GET'])]
-    #[IsGranted('ROLE_ADMIN', message: 'You don\'t have the rights to visualize the list of clients')]
-    #[OA\Response(
-        response: 200,
-        description: 'Returns the list of all clients',
-        content: new Model(type: Client::class, groups: ['getClients'])
-    )]
-    #[OA\Tag(name: 'Client')]
-    public function index(
-        ClientRepository $clientRepository,
-        SerializerInterface $serializer
-    ): JsonResponse {
-        $userList = $clientRepository->findAll();
-
-        $context = SerializationContext::create()->setGroups(['getClients']);
-        $jsonUserList = $serializer->serialize($userList, 'json', $context);
-
-        return new JsonResponse($jsonUserList, Response::HTTP_OK, [], true);
-    }
+//    #[Route('/api/clients', name: 'app_client', methods: ['GET'])]
+//    #[IsGranted('ROLE_ADMIN', message: 'You don\'t have the rights to visualize the list of clients')]
+//    #[OA\Response(
+//        response: 200,
+//        description: 'Returns the list of all clients',
+//        content: new Model(type: Client::class, groups: ['getClients'])
+//    )]
+//    #[OA\Tag(name: 'Client')]
+//    public function index(
+//        ClientRepository $clientRepository,
+//        SerializerInterface $serializer
+//    ): JsonResponse {
+//        $userList = $clientRepository->findAll();
+//
+//        $context = SerializationContext::create()->setGroups(['getClients']);
+//        $jsonUserList = $serializer->serialize($userList, 'json', $context);
+//
+//        return new JsonResponse($jsonUserList, Response::HTTP_OK, [], true);
+//    }
 
     #[Route('/api/clients/{id}/users', name: 'app_client_users', methods: ['GET'])]
     #[IsGranted('ROLE_ADMIN', message: 'You don\'t have the rights to view the list of users')]
@@ -51,6 +51,18 @@ class ClientController extends AbstractController
         name: 'id',
         description: 'The id number of the client',
         in: 'path',
+        schema: new OA\Schema(type: 'integer')
+    )]
+    #[OA\Parameter(
+        name: 'page',
+        description: 'The page where to start the research',
+        in: 'query',
+        schema: new OA\Schema(type: 'integer')
+    )]
+    #[OA\Parameter(
+        name: 'limit',
+        description: 'How many results to include in the research',
+        in: 'query',
         schema: new OA\Schema(type: 'integer')
     )]
     #[OA\Tag(name: 'Client')]

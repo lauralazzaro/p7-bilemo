@@ -83,6 +83,8 @@ class UserController extends AbstractController
 
         $content = $request->toArray();
 
+        $user->setRoles(['ROLE_USER']);
+
         $idClient = $content['clientId'] ?? -1;
         $user->setClient($clientRepository->find($idClient));
 

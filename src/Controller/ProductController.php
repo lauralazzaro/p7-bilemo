@@ -18,11 +18,27 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class ProductController extends AbstractController
 {
-    #[Route('/api/products', name: 'app_product', methods: ['GET'])]
+    #[Route(
+        '/api/products',
+        name: 'app_product',
+        methods: ['GET']
+    )]
     #[OA\Response(
         response: 200,
         description: 'Returns the list of the products',
-        content: new Model(type: Product::class, groups: ['getProducts'])
+        content: new Model(type: Product::class, groups: ['getProducts']),
+    )]
+    #[OA\Parameter(
+        name: 'page',
+        description: 'The page where to start the research',
+        in: 'query',
+        schema: new OA\Schema(type: 'integer')
+    )]
+    #[OA\Parameter(
+        name: 'limit',
+        description: 'How many results to include in the research',
+        in: 'query',
+        schema: new OA\Schema(type: 'integer')
     )]
     #[OA\Tag(name: 'Product')]
     public function index(
