@@ -11,6 +11,7 @@ use JMS\Serializer\SerializerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -85,8 +86,16 @@ class UserController extends AbstractController
 
         $user->setRoles(['ROLE_USER']);
 
-        $idClient = $content['clientId'] ?? -1;
+        if (!isset($content['clientId'])) {
+            throw new BadRequestException('The clientId must not be empty', 400);
+        }
+
+        $idClient = $content['clientId'];
+
         $user->setClient($clientRepository->find($idClient));
+
+        $hashedPassword = password_hash($user->getPassword(), PASSWORD_DEFAULT);
+        $user->setPassword($hashedPassword);
 
         $em->persist($user);
         $em->flush();
